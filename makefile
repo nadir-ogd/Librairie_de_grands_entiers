@@ -1,16 +1,20 @@
 CC = gcc
-CFLAGS = -Wall -std=c99
+CFLAGS = -Wall -g -Iinclude/
+OPT = -O3
+SRC = main.c $(wildcard src/*.c)
 
-all: main
+OBJ = $(patsubst main.o, obj/main.o, $(patsubst src/%, obj/%, $(patsubst %.c, %.o, $(SRC))))
 
-main: main.o lib.o
-	$(CC) $(CFLAGS) -o $@ $^
+main: $(OBJ)
+	$(CC) $^ $(OPT) -o $@
 
-main.o: main.c lib.h
-	$(CC) $(CFLAGS) -c $<
+obj/%.o: src/%.c include/%.h
+	$(CC) -c $< $(CFLAGS) -o $@
 
-lib.o: lib.c lib.h
-	$(CC) $(CFLAGS) -c $<
+obj/main.o: main.c
+	$(CC) -c $< $(CFLAGS) -o $@
 
 clean:
-	rm -f *.o my_program
+	rm -f obj/*.o src/*~ include/*~ main
+
+.PHONY: clean
