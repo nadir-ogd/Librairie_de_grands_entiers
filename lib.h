@@ -1,6 +1,9 @@
 #ifndef LIB_H
 #define LIB_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 /* Type bigint */
 typedef struct bigint {
 unsigned int size; /* taille */
@@ -22,6 +25,5 @@ bigint *strtobigint(char *s); /* Conversion chaine vers bigint */
 /* Conversion bigint vers chaine */
 /* Decimales entre first et last */
 char *biginttosubstr(bigint n, int first, int last);
-
 
 #endif
