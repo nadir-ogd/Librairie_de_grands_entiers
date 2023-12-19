@@ -28,19 +28,20 @@ int main(){
     
     bigint c = add(a, b);
 
-    printf("< ADD >\n c = ");
+    printf("< ADD >\n");
     printf("Taille de c = %d\n",c.size);
 
     for(int i = c.size-1; i >= 0; i--)
-        printf("%d\n",c.value[i]);
-        
+        printf("%d",c.value[i]);
+
     bigint d = sub(a, b);
 
-    printf("\n< SUB >\n d = ");
+    printf("\n< SUB >\n");
+    printf("Taille de d = %d\n",d.size);
+
     for(int i = d.size-1; i >= 0; i--)
         printf("%d",d.value[i]);
 
-    printf("Taille de d = %d\n",d.size);
 
     free(a.value);
     free(b.value);

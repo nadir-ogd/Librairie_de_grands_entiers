@@ -141,21 +141,18 @@ bigint add(bigint a, bigint b) {
             carry = 0;
             c.value[i] = sum;
         }
-        
+    }
+
+
         // cas où le dernier élément de tableau a une retenue et s'écrit pas dans 10^9
-        if (countDigits(sum) > 9 && i == c.size - 1) {
+        if (countDigits(c.value[c.size-1]) > 9) {
             c.size++;
             c.value = realloc(c.value, c.size * sizeof(unsigned int));
 
-            // Calculer le quotient et le reste
-            unsigned int quotient = c.value[c.size - 2] / power(10, max_nb_digits);
-            c.value[c.size - 1] = c.value[c.size - 2] % power(10, max_nb_digits);
-
-            // Ajouter le quotient au nouvel élément du tableau
-            c.value[c.size - 2] = quotient;
+            c.value[c.size - 1] = c.value[c.size - 2] / power(10, max_nb_digits);;
+            
+            c.value[c.size - 2] = c.value[c.size - 2] % power(10, max_nb_digits);
         }
-
-    }
     return c;
 }
 
