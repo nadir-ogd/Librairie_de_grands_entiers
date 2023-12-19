@@ -133,12 +133,6 @@ bigint add(bigint a, bigint b) {
         }
 
         sum += carry;
-        // printf("Pour a[%d] + b[%d] : %d + %d\n",i,i,a.value[i],b.value[i]);
-        // printf("nb_digit_a  = %d\n",nb_digit_a);
-        // printf("nb_digit_b  = %d\n",nb_digit_b);
-        // printf("max_nb_digits  = %d\n",max_nb_digits);
-        // printf("c.value[%d] avant : %d\n",i,sum);
-        
     
         if (countDigits(sum) > max_nb_digits && i != c.size - 1) {
             carry = 1;
@@ -147,20 +141,65 @@ bigint add(bigint a, bigint b) {
             carry = 0;
             c.value[i] = sum;
         }
-        // printf("c.value[%d] apres : %d\n",i,c.value[i]);
+        
+        // cas où le dernier élément de tableau a une retenue et s'écrit pas dans 10^9
+        if (countDigits(sum) > 9 && i == c.size - 1) {
+            c.size++;
+            c.value = realloc(c.value, c.size * sizeof(unsigned int));
+
+            // Calculer le quotient et le reste
+            unsigned int quotient = c.value[c.size - 2] / power(10, max_nb_digits);
+            c.value[c.size - 1] = c.value[c.size - 2] % power(10, max_nb_digits);
+
+            // Ajouter le quotient au nouvel élément du tableau
+            c.value[c.size - 2] = quotient;
+        }
+
     }
-
-    // printf("c = ");
-    // for (int i = c.size - 1; i >= 0; i--) {
-    //     printf("%07u", c.value[i]);
-    // }
-    // printf("\n");
-
     return c;
 }
 
 bigint sub(bigint a, bigint b){
+    bigint c;
+    unsigned int borrow = 0, nb_digit_a, nb_digit_b, max_nb_digits;
 
+    if (cmp(a, b) < 0) {
+        fprintf(stderr, "Erreur : a doit être supérieur ou égal à b pour la soustraction.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    c.size = a.size;
+    c.value = (unsigned int *)malloc(c.size * sizeof(unsigned int));
+
+    for (unsigned int i = 0; i < c.size; i++) {
+        nb_digit_a = (i < a.size) ? countDigits(a.value[i]) : 0;
+        nb_digit_b = (i < b.size) ? countDigits(b.value[i]) : 0;
+
+        max_nb_digits = (nb_digit_a > nb_digit_b) ? nb_digit_a : nb_digit_b;
+
+        int diff = 0;
+        if (i < b.size) {
+            diff = a.value[i] - b.value[i] - borrow;
+        } else {
+            diff = a.value[i] - borrow;
+        }
+
+        if (diff < 0) {
+            borrow = 1;
+            diff += power(10, max_nb_digits);
+        } else {
+            borrow = 0;
+        }
+
+        c.value[i] = diff;
+    }
+
+    while (c.size > 1 && c.value[c.size - 1] == 0) {
+        c.size--;
+        c.value = realloc(c.value, c.size * sizeof(unsigned int));
+    }
+
+    return c;
 }
 
 bigint product(bigint a, bigint b){
