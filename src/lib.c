@@ -6,10 +6,12 @@ unsigned int countDigits(unsigned int x) {
         return 1;
     }
     unsigned int count = 0;
+
     while (x > 0) {
         x /= 10;
         count++;
     }
+
     return count;
 }
 
@@ -23,18 +25,24 @@ unsigned int power(unsigned int base, unsigned int exponent) {
         base *= base;
         exponent /= 2;
     }
+
     return result;
 }
 
-unsigned int reverseDigits(unsigned int n) {
-    unsigned int r = 0;
 
-    while (n > 0) {
-        r = r * 10 + n % 10;
-        n /= 10;
+void copyAndFormat(bigint original, unsigned int *result) {
+    unsigned int ind = 0;
+
+    // Copier et formater les chiffres
+    for (unsigned int i = 0; i < original.size; i++) {
+        unsigned int val = original.value[i];
+
+        // Copier chaque chiffre individuel dans le tableau résultant
+        while (val != 0) {
+            result[ind++] = val % 10;
+            val /= 10;
+        }
     }
-
-    return r;
 }
 
 int cmp(bigint a, bigint b) {
@@ -48,23 +56,25 @@ int cmp(bigint a, bigint b) {
     unsigned int *a_copy = (unsigned int *)malloc(a_bit_size * sizeof(unsigned int));
     unsigned int *b_copy = (unsigned int *)malloc(b_bit_size * sizeof(unsigned int));
 
-    unsigned int ind = 0;
-    for (unsigned int i = 0; i < a.size; i++) {
-        unsigned int val = a.value[i];
-        while (val != 0) {
-            a_copy[ind++] = val % 10;
-            val /= 10;
-        }
-    }
+    // unsigned int ind = 0;
+    // for (unsigned int i = 0; i < a.size; i++) {
+    //     unsigned int val = a.value[i];
+    //     while (val != 0) {
+    //         a_copy[ind++] = val % 10;
+    //         val /= 10;
+    //     }
+    // }
 
-    ind = 0;
-    for (unsigned int i = 0; i < b.size; i++) {
-        unsigned int val = b.value[i];
-        while (val != 0) {
-            b_copy[ind++] = val % 10;
-            val /= 10;
-        }
-    }
+    // ind = 0;
+    // for (unsigned int i = 0; i < b.size; i++) {
+    //     unsigned int val = b.value[i];
+    //     while (val != 0) {
+    //         b_copy[ind++] = val % 10;
+    //         val /= 10;
+    //     }
+    // }
+    copyAndFormat(a, a_copy);
+    copyAndFormat(b, b_copy);
     
     printf("\na = ");
     for(unsigned int i = 0; i < a_bit_size; i++)
@@ -166,10 +176,10 @@ bigint add(bigint a, bigint b) {
 
         unsigned int sum = 0;
         if (i < a.size) {
-            sum += reverseDigits(a.value[i]);
+            sum += a.value[i];
         }
         if (i < b.size) {
-            sum += reverseDigits(b.value[i]);
+            sum += b.value[i];
         }
 
         sum += carry;
@@ -216,9 +226,9 @@ bigint sub(bigint a, bigint b){
 
         int diff = 0;
         if (i < b.size) {
-            diff = reverseDigits(a.value[i]) - reverseDigits(b.value[i]) - borrow;
+            diff = a.value[i] - b.value[i] - borrow;
         } else {
-            diff = reverseDigits(a.value[i]) - borrow;
+            diff = a.value[i] - borrow;
         }
 
         if (diff < 0) {
@@ -315,32 +325,32 @@ bigint product(bigint a, bigint b) {
     c.size = a.size + b.size;
     c = add(zero, zero);
 
-    // printf("\nc avant = ");
+    printf("\nc avant = ");
     for(int i = c.size-1; i >= 0; i--)
         printf("%d",c.value[i]);
 
-    // printf("\nb avant = ");
+    printf("\nb avant = ");
     for(int i = b.size-1; i >= 0; i--)
         printf("%d",b.value[i]);
 
-    // printf("\ntmp avant = ");
+    printf("\ntmp avant = ");
     for(int i = tmp.size-1; i >= 0; i--)
         printf("%d",tmp.value[i]);
 
-    // printf("\ncmp(tmp, zero) = %d\n",cmp(tmp, zero));
+    printf("\ncmp(tmp, zero) = %d\n",cmp(tmp, zero));
     while (cmp(b, tmp) != 0) {
         c = add(c, a);
         tmp = add(tmp, one);
 
-        // printf("\nc après = ");
+        printf("\nc après = ");
         for(int i = c.size-1; i >= 0; i--)
             printf("%d",c.value[i]);
         
-        // printf("\ntmp après = ");
+        printf("\ntmp après = ");
         for(int i = tmp.size-1; i >= 0; i--)
             printf("%d",tmp.value[i]);
 
-        // printf("\none après = ");
+        printf("\none après = ");
         for(int i = one.size-1; i >= 0; i--)
             printf("%d",one.value[i]);
             
