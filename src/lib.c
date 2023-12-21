@@ -53,8 +53,14 @@ void initBigint(bigint *nb, const char *str) {
 }
 
 int cmp(bigint a, bigint b){
+    unsigned int a_len = 0, b_len = 0;
 
-    if (a.size > b.size){//a > b 
+    for (unsigned int i = 0; i < a.size; i++)
+        a_len += countDigits(a.value[i]);
+    for (unsigned int i = 0; i < b.size; i++)
+        b_len += countDigits(b.value[i]);
+    
+    if (a_len > b_len){//a > b 
         for(unsigned int i = 0; i < b.size; i++){
             if (a.value[i] != b.value[i]){
                 return (i+1);
@@ -62,7 +68,7 @@ int cmp(bigint a, bigint b){
         }
         return b.size;
     }
-    else if (a.size < b.size) {//b > a
+    else if (a_len < b_len) {//b > a
         for(unsigned int i = 0; i < a.size; i++)
             if (a.value[i] != b.value[i])
                 return -(i+1);
