@@ -1,10 +1,7 @@
 #include "./lib.h"
 
-//external functions
+//External functions
 unsigned int countDigits(unsigned int x) {
-    if (x == 0) {
-        return 1;
-    }
     unsigned int count = 0;
     while (x > 0) {
         x /= 10;
@@ -26,128 +23,55 @@ unsigned int power(unsigned int base, unsigned int exponent) {
     return result;
 }
 
-unsigned int reverseDigits(unsigned int n) {
-    unsigned int r = 0;
-
-    while (n > 0) {
-        r = r * 10 + n % 10;
-        n /= 10;
+void initBigint(bigint *nb, const char *str) {
+    int len = strlen(str);
+    nb->size = (len + 8) / 9;//+8 : car la plus petite valeur pour len est 1
+    nb->value = (unsigned int *)malloc(nb->size * sizeof(unsigned int));
+    if (nb->value == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        exit(EXIT_FAILURE);
     }
 
-    return r;
+    for (unsigned int i = 0; i < nb->size; ++i) {
+        nb->value[i] = 0;
+    }
+
+    int ind = 0;
+    for (int i = len - 1; i >= 0; i -= 9) {
+        int tmp = 0;
+        for (int j = i - 8; j <= i; ++j) {
+            if (j >= 0) {
+                tmp = tmp * 10 + (str[j] - '0');
+            }
+        }
+        nb->value[ind++] = tmp;
+    }
 }
 
-int cmp(bigint a, bigint b) {
-    unsigned int a_bit_size = 0, b_bit_size = 0;
+int cmp(bigint a, bigint b){
 
-    for (unsigned int i = 0; i < a.size; i++)
-        a_bit_size += countDigits(a.value[i]);
-    for (unsigned int i = 0; i < b.size; i++)
-        b_bit_size += countDigits(b.value[i]);
-
-    unsigned int *a_copy = (unsigned int *)malloc(a_bit_size * sizeof(unsigned int));
-    unsigned int *b_copy = (unsigned int *)malloc(b_bit_size * sizeof(unsigned int));
-
-    unsigned int ind = 0;
-    for (unsigned int i = 0; i < a.size; i++) {
-        unsigned int val = a.value[i];
-        while (val != 0) {
-            a_copy[ind++] = val % 10;
-            val /= 10;
+    if (a.size > b.size){//a > b 
+        for(unsigned int i = 0; i < b.size; i++)
+            if (a.value[i] != b.value[i])
+                return i;
+            return b.size;
+    }
+    else if (a.size < b.size) {//b > a
+        for(unsigned int i = 0; i < a.size; i++)
+            if (a.value[i] != b.value[i])
+                return -i;
+            return -(a.size);
+    }
+    else{//a > b ou b < a
+        for(unsigned int i = 0; i < a.size; i++){
+            if (a.value[i] > b.value[i])
+                return i;
+            if (a.value[i] < b.value[i])
+                return -i;
         }
     }
 
-    ind = 0;
-    for (unsigned int i = 0; i < b.size; i++) {
-        unsigned int val = b.value[i];
-        while (val != 0) {
-            b_copy[ind++] = val % 10;
-            val /= 10;
-        }
-    }
-    
-    printf("\na = ");
-    for(unsigned int i = 0; i < a_bit_size; i++)
-        printf("%d",a_copy[i]);
-    
-    printf("\nb = ");
-    for(unsigned int i = 0; i < b_bit_size; i++)
-        printf("%d",b_copy[i]);
-
-    printf("\n");
-
-    unsigned int pos = 0;
-    unsigned int a_nb = 0, b_nb = 0;
-
-
-    if (a_bit_size == b_bit_size) {
-        unsigned int base = 1;
-
-        for (unsigned int i = 0; i < a_bit_size; ++i) {
-            a_nb += a_copy[i] * base;
-            b_nb += b_copy[i]* base;
-            base *= 10;
-        }
-
-        printf("a_nb = %d\n",a_nb);
-        printf("b_nb = %d\n",b_nb);
-
-        if(a_nb == b_nb)
-            return 0;
-        else{
-            for (unsigned int i = 0; i < a_bit_size; i++)
-                if (a_copy[i] != b_copy[i]) {
-                    pos = i;
-                    break;
-                }
-            unsigned int j = 0;
-            if (a_nb > b_nb){
-                for (unsigned int i = 0; i < a.size; i++){
-                    for(unsigned int j = i; j < countDigits(a.value[i]); j++){
-                        if (j == pos)
-                            return (i + 1);
-                    }
-                }
-            }
-            else{
-                for (unsigned int i = 0; i < a.size; i++){
-                    for(unsigned int j = i; j < countDigits(a.value[i]); j++){
-                        if (j == pos)
-                            return -(i + 1);
-                    }
-                }
-            }
-        }
-    } else if (a_bit_size > b_bit_size) {
-        for (unsigned int i = 0; i < b_bit_size; i++)
-            if (a_copy[i] != b_copy[i]) {
-                pos = i;
-                break;
-            }
-        unsigned int j = 0;
-        for (unsigned int i = 0; i < a.size; i++) {
-            for (j = i; j < a_bit_size; j++) {
-                if (j == pos)
-                    return (i + 1);
-            }
-        }
-    } else {
-        for (unsigned int i = 0; i < b_bit_size; i++)
-            if (a_copy[i] != b_copy[i]) {
-                pos = i;
-                break;
-            }
-        unsigned int j = 0;
-        for (unsigned int i = 0; i < a.size; i++) {
-            for (j = i; j < a_bit_size; j++) {
-                if (j == pos)
-                    return -(i + 1);
-            }
-        }
-    }
-    free(a_copy);
-    free(b_copy);
-    return 0;
+    return 0; 
 }
 
 bigint add(bigint a, bigint b) {
@@ -166,10 +90,10 @@ bigint add(bigint a, bigint b) {
 
         unsigned int sum = 0;
         if (i < a.size) {
-            sum += reverseDigits(a.value[i]);
+            sum += a.value[i];
         }
         if (i < b.size) {
-            sum += reverseDigits(b.value[i]);
+            sum += b.value[i];
         }
 
         sum += carry;
@@ -216,9 +140,9 @@ bigint sub(bigint a, bigint b){
 
         int diff = 0;
         if (i < b.size) {
-            diff = reverseDigits(a.value[i]) - reverseDigits(b.value[i]) - borrow;
+            diff = a.value[i] - b.value[i] - borrow;
         } else {
-            diff = reverseDigits(a.value[i]) - borrow;
+            diff = a.value[i] - borrow;
         }
 
         if (diff < 0) {
@@ -328,9 +252,9 @@ bigint product(bigint a, bigint b) {
         printf("%d",tmp.value[i]);
 
     // printf("\ncmp(tmp, zero) = %d\n",cmp(tmp, zero));
-    while (cmp(b, tmp) != 0) {
+    while (cmp(b, tmp) == 0) {
         c = add(c, a);
-        tmp = add(tmp, one);
+        tmp = sub(tmp, one);
 
         // printf("\nc après = ");
         for(int i = c.size-1; i >= 0; i--)

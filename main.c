@@ -2,19 +2,7 @@
 
 int main(){
 
-    bigint a,b;
-
-    a.size = 3;
-    b.size = 2;
-
-    a.value = (unsigned int*)malloc(a.size * sizeof(unsigned int));
-    b.value = (unsigned int*)malloc(b.size * sizeof(unsigned int));
-    
-    b.value[0] = 1;
-    b.value[1] = 2;
-    a.value[0] = 1;
-    a.value[1] = 1;
-    a.value[2] = 215;
+    init()
 
     
     printf("cmp(a, b) = %d\n",cmp(a, b));
@@ -45,6 +33,8 @@ int main(){
 
     free(a.value);
     free(b.value);
-    // free(c.value);
+    free(c.value);
+    free(d.value);
+    free(s.value);
 
     }
