@@ -3,18 +3,18 @@
 int main(){
     bigint a,b;
 
-    initBigint(&a, "323456789123456789123456789123456789");
-    initBigint(&b, "223456789123456789123456789123456789");
+    initBigint(&a, "100000000000002");
+    initBigint(&b, "1");
     
     printf("a.size = %d\n",a.size);
     printf("b.size = %d\n",b.size);
     printf("cmp(a, b) = %d\n",cmp(a, b));
 
-    // bigint c = add(a, b);
-    // printf("\n< ADDITION >\n");
-    // printf("a + b = ");
-    // for(int i = c.size-1; i >= 0; i--)
-    //     printf("%d",c.value[i]);
+    bigint c = add(a, b);
+    printf("\n< ADDITION >\n");
+    printf("a + b = ");
+    for(int i = c.size-1; i >= 0; i--)
+        printf("%d",c.value[i]);
 
     // printf("\n");
 

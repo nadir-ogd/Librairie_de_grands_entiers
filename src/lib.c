@@ -70,7 +70,6 @@ int cmp(bigint a, bigint b){
     }
     else{//a > b ou b < a
         for(unsigned int i = 0; i < a.size; i++){
-            printf("a.Value[%d] = %d | b.value[%d] = %d\n",i,a.value[i],i,b.value[i]);
             if (a.value[i] > b.value[i])
                 return (i+1);
             if (a.value[i] < b.value[i])
@@ -115,7 +114,7 @@ bigint add(bigint a, bigint b) {
 
 
         // cas où le dernier élément de tableau a une retenue et s'écrit pas dans 10^9
-        if (countDigits(c.value[c.size-1]) > 9) {
+        if (carry > 0) {
             c.size++;
             c.value = realloc(c.value, c.size * sizeof(unsigned int));
 
