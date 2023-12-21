@@ -3,12 +3,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Type bigint */
 typedef struct bigint {
 unsigned int size; /* taille */
 unsigned int *value; /* valeur */
 } bigint;
+
+/* External funcitons */
+void initBigint(bigint *nb, const char *str);
+unsigned int power(unsigned int base, unsigned int exponent);
+unsigned int countDigits(unsigned int x);
 
 /* Operators */
 int cmp(bigint a, bigint b); /* Comparaison */

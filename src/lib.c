@@ -36,16 +36,20 @@ void initBigint(bigint *nb, const char *str) {
         nb->value[i] = 0;
     }
 
-    int ind = 0;
+ int index = 0;
     for (int i = len - 1; i >= 0; i -= 9) {
-        int tmp = 0;
+        int temp = 0;
         for (int j = i - 8; j <= i; ++j) {
             if (j >= 0) {
-                tmp = tmp * 10 + (str[j] - '0');
+                temp = temp * 10 + (str[j] - '0');
             }
         }
-        nb->value[ind++] = tmp;
+        nb->value[index++] = temp;
     }
+
+    for(int i = nb->size-1; i >= 0; i--)
+        printf("%d",nb->value[i]);
+    printf("\n");
 }
 
 int cmp(bigint a, bigint b){
