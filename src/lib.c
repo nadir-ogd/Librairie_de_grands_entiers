@@ -36,7 +36,7 @@ void initBigint(bigint *nb, const char *str) {
         nb->value[i] = 0;
     }
 
- int index = 0;
+    int ind = 0;
     for (int i = len - 1; i >= 0; i -= 9) {
         int temp = 0;
         for (int j = i - 8; j <= i; ++j) {
@@ -44,7 +44,7 @@ void initBigint(bigint *nb, const char *str) {
                 temp = temp * 10 + (str[j] - '0');
             }
         }
-        nb->value[index++] = temp;
+        nb->value[ind++] = temp;
     }
 
     for(int i = nb->size-1; i >= 0; i--)
@@ -55,26 +55,28 @@ void initBigint(bigint *nb, const char *str) {
 int cmp(bigint a, bigint b){
 
     if (a.size > b.size){//a > b 
-        for(unsigned int i = 0; i < b.size; i++)
-            if (a.value[i] != b.value[i])
-                return i;
-            return b.size;
+        for(unsigned int i = 0; i < b.size; i++){
+            if (a.value[i] != b.value[i]){
+                return (i+1);
+            }
+        }
+        return b.size;
     }
     else if (a.size < b.size) {//b > a
         for(unsigned int i = 0; i < a.size; i++)
             if (a.value[i] != b.value[i])
-                return -i;
-            return -(a.size);
+                return -(i+1);
+        return -(a.size);
     }
     else{//a > b ou b < a
         for(unsigned int i = 0; i < a.size; i++){
+            printf("a.Value[%d] = %d | b.value[%d] = %d\n",i,a.value[i],i,b.value[i]);
             if (a.value[i] > b.value[i])
-                return i;
+                return (i+1);
             if (a.value[i] < b.value[i])
-                return -i;
+                return -(i+1);
         }
     }
-
     return 0; 
 }
 

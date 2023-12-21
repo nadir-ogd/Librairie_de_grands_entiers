@@ -3,10 +3,12 @@
 int main(){
     bigint a,b;
 
-    initBigint(&a, "123451234512345");
-    initBigint(&b, "123456789987654321123456789");
+    initBigint(&a, "323456789123456789123456789123456789");
+    initBigint(&b, "223456789123456789123456789123456789");
     
-    //printf("cmp(a, b) = %d\n",cmp(a, b));
+    printf("a.size = %d\n",a.size);
+    printf("b.size = %d\n",b.size);
+    printf("cmp(a, b) = %d\n",cmp(a, b));
 
     // bigint c = add(a, b);
     // printf("\n< ADDITION >\n");
