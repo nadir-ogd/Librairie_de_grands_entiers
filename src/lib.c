@@ -227,7 +227,32 @@ char *biginttostr(bigint n){
 }
 
 bigint *strtobigint(char *s){
+    int len = strlen(s);
+    
+    bigint *n = (bigint *)malloc(sizeof(bigint));
+    n->size = (len + 8) / 9;//+8 : car la plus petite valeur pour len est 1
+    n->value = (unsigned int *)malloc(n->size * sizeof(unsigned int));
+    
+    if (n->value == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        exit(EXIT_FAILURE);
+    }
 
+    for (unsigned int i = 0; i < n->size; ++i)
+        n->value[i] = 0;
+
+    int ind = 0;
+    for (int i = len - 1; i >= 0; i -= 9) {
+        int temp = 0;
+        for (int j = i - 8; j <= i; ++j) {
+            if (j >= 0) {
+                temp = temp * 10 + (s[j] - '0');
+            }
+        }
+        n->value[ind++] = temp;
+    }
+
+    return n;
 }
 
 char *biginttosubstr(bigint n, int first, int last){

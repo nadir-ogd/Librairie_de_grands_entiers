@@ -26,6 +26,11 @@ int main(){
     printf("a * b = ");
     printbigint(s);
 
+
+    bigint *t = strtobigint("123");
+    printbigint(*t);
+
+    free(t);
     // free(a.value);
     // free(b.value);
     // free(c.value);
