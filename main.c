@@ -3,8 +3,8 @@
 int main(){
     bigint a,b;
 
-    initBigint(&a, "111111111111111111111111111111111111");
-    initBigint(&b, "88888888888888888888888888888888888");
+    initBigint(&a, "740725926");
+    initBigint(&b, "222222222");
     
     printf("a.size = %d\n",a.size);
     printf("b.size = %d\n",b.size);
@@ -31,13 +31,13 @@ int main(){
     for(int i = d.size-1; i >= 0; i--)
         printf("%d",d.value[i]);
 
-    // printf("\n");
+    printf("\n");
 
-    // bigint s = product(a, b);
-    // printf("\n< PRODUCT >\n");
-    // printf("a * b = ");
-    // for(int i = s.size-1; i >= 0; i--)
-    //     printf("%d",s.value[i]);
+    bigint s = product(a, b);
+    printf("\n< PRODUCT >\n");
+    printf("a * b = ");
+    for(int i = s.size-1; i >= 0; i--)
+        printf("%d",s.value[i]);
 
     // printf("\n");
 

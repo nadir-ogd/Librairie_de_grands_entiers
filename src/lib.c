@@ -46,10 +46,6 @@ void initBigint(bigint *nb, const char *str) {
         }
         nb->value[ind++] = temp;
     }
-
-    for(int i = nb->size-1; i >= 0; i--)
-        printf("%d",nb->value[i]);
-    printf("\n");
 }
 
 int cmp(bigint a, bigint b){
@@ -89,15 +85,30 @@ bigint add(bigint a, bigint b) {
     bigint c;
     unsigned int carry = 0, nb_digit_a, nb_digit_b, max_nb_digits;
 
-    c.size = (a.size >= b.size) ? a.size : b.size;
+    if(a.size >= b.size)
+        c.size = a.size;
+    else    
+        c.size = b.size;
 
     c.value = (unsigned int *)malloc(c.size * sizeof(unsigned int));
 
     for (unsigned int i = 0; i < c.size; i++) {
-        nb_digit_a = (i < a.size) ? countDigits(a.value[i]) : 0;
-        nb_digit_b = (i < b.size) ? countDigits(b.value[i]) : 0;
+        if (i < a.size)
+            nb_digit_a = countDigits(a.value[i]);
+        else
+            nb_digit_a = 0;
 
-        max_nb_digits = (nb_digit_a > nb_digit_b) ? nb_digit_a : nb_digit_b;
+        if (i < b.size)
+            nb_digit_b = countDigits(b.value[i]);
+        else
+            nb_digit_b = 0;
+
+
+        if (nb_digit_a > nb_digit_b) {
+            max_nb_digits = nb_digit_a;
+        } else {
+            max_nb_digits = nb_digit_b;
+        }
 
         unsigned int sum = 0;
         if (i < a.size) {
@@ -117,7 +128,6 @@ bigint add(bigint a, bigint b) {
             c.value[i] = sum;
         }
     }
-
 
         // cas où le dernier élément de tableau a une retenue et s'écrit pas dans 10^9
         if (carry > 0) {
@@ -173,148 +183,29 @@ bigint sub(bigint a, bigint b){
     return c;
 }
 
-// bigint product(bigint a, bigint b){
-//     bigint c;
-//     c.size = a.size;
-//     c.value = (unsigned int *)malloc(c.size * sizeof(unsigned int));
-    
-//     bigint one;
-//     one.size = 1;
-//     one.value = (unsigned int *)malloc(one.size * sizeof(unsigned int));
-//     one.value[0] = 1;
-    
-//     bigint zero;
-//     zero.size = 1;
-//     zero.value = (unsigned int *)malloc(zero.size * sizeof(unsigned int));
-//     one.value[0] = 0;
-
-//     bigint tmp;
-//     tmp.size = b.size;
-//     tmp.value = (unsigned int *)malloc(tmp.size * sizeof(unsigned int));
-
-//     for (unsigned int i = 0; i < tmp.size; i++)
-//         tmp.value[i] = b.value[i];
-
-//     printf("Avant c : ");
-//     for(int i = c.size-1; i >= 0; i--)
-//         printf("%d",c.value[i]);
-
-//     printf("\nAvant tmp : ");
-//     for(int i = tmp.size-1; i >= 0; i--)
-//         printf("%d",tmp.value[i]);
-
-//     c = add(zero, zero);
-//     if (cmp(a, b) > 0){
-//         while(cmp(tmp, zero) != 0){
-//             c = add(c, a);
-//             tmp = sub(tmp, one);
-
-//             printf("\nDans boucle c = ");
-//             for(int i = c.size-1; i >= 0; i--)
-//                 printf("%d",c.value[i]);
-
-//             printf("\nDans boucle tmp = ");
-//             for(int i = tmp.size-1; i >= 0; i--)
-//                 printf("%d",tmp.value[i]);
-
-//             printf("\n cmp(tmp, zero) = %d\n", cmp(tmp, zero));
-//         }
-//     }
-
-//     printf("\nAprès c = ");
-//     for(int i = c.size-1; i >= 0; i--)
-//         printf("%d",c.value[i]);
-    
-//     printf("\nAprès tmp = ");
-//     for(int i = tmp.size-1; i >= 0; i--)
-//         printf("%d",tmp.value[i]);
-//     return c;
-// }
-
 bigint product(bigint a, bigint b) {
-    bigint one;
-    one.size = 1;
-    one.value = (unsigned int *)calloc(one.size, sizeof(unsigned int));
-    one.value[0] = 1;
-
-    bigint zero;
-    zero.size = b.size;
-    zero.value = (unsigned int *)calloc(zero.size, sizeof(unsigned int));
-    zero.value[0] = 0;
-
-    bigint tmp;
-    tmp.size = b.size;
-    tmp.value = (unsigned int *)calloc(tmp.size, sizeof(unsigned int));
-         
     bigint c;
     c.size = a.size + b.size;
-    c = add(zero, zero);
+    c.value = (unsigned int *)calloc(c.size, sizeof(unsigned int));
 
-    // printf("\nc avant = ");
-    for(int i = c.size-1; i >= 0; i--)
-        printf("%d",c.value[i]);
-
-    // printf("\nb avant = ");
-    for(int i = b.size-1; i >= 0; i--)
-        printf("%d",b.value[i]);
-
-    // printf("\ntmp avant = ");
-    for(int i = tmp.size-1; i >= 0; i--)
-        printf("%d",tmp.value[i]);
-
-    // printf("\ncmp(tmp, zero) = %d\n",cmp(tmp, zero));
-    while (cmp(b, tmp) == 0) {
-        c = add(c, a);
-        tmp = sub(tmp, one);
-
-        // printf("\nc après = ");
-        for(int i = c.size-1; i >= 0; i--)
-            printf("%d",c.value[i]);
-        
-        // printf("\ntmp après = ");
-        for(int i = tmp.size-1; i >= 0; i--)
-            printf("%d",tmp.value[i]);
-
-        // printf("\none après = ");
-        for(int i = one.size-1; i >= 0; i--)
-            printf("%d",one.value[i]);
-            
+    for (unsigned int i = 0; i < a.size; i++) {
+        unsigned int carry = 0;
+        for (unsigned int j = 0; j < b.size; j++) {
+            unsigned long long p = (unsigned long long)a.value[i] * b.value[j] + c.value[i + j] + carry;
+            c.value[i + j] = p % power(10, 9);
+            carry = p / power(10, 9);
+        }
+        c.value[i + b.size] += carry;
     }
-
-    free(one.value);
-    free(zero.value);
-    free(tmp.value);
+    
+    // Retirer les zéros non significatifs à gauche
+    while (c.size >= 2 && c.value[c.size - 1] == 0){//la taille de bigint doit etre au moin 1
+        c.size--;
+        c.value = realloc(c.value, c.size * sizeof(unsigned int));
+    }
 
     return c;
 }
-
-
-
-
-// bigint product(bigint a, bigint b) {
-//     bigint c;
-//     c.size = a.size + b.size;
-//     c.value = (unsigned int *)calloc(c.size, sizeof(unsigned int));
-
-//     for (unsigned int i = 0; i < a.size; i++) {
-//         unsigned int carry = 0;
-//         for (unsigned int j = 0; j < b.size; j++) {
-//             unsigned long long p = (unsigned long long)a.value[i] * b.value[j] + c.value[i + j] + carry;
-//             c.value[i + j] = p % power(10, 9);
-//             carry = p / power(10, 9);
-//             printf("p = %u | c.value[%d + %d] = %d | carry = %d\n",p,i,j,c.value[i+j],carry);
-//         }
-//         c.value[i + b.size] += carry;
-//     }
-    
-//     // Retirer les zéros non significatifs à gauche
-//     while (c.size > 1 && c.value[c.size - 1] == 0) {
-//         c.size--;
-//         c.value = realloc(c.value, c.size * sizeof(unsigned int));
-//     }
-
-//     return c;
-// }
 
 
 void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
