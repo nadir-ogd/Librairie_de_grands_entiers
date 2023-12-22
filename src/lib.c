@@ -217,7 +217,9 @@ bigint pow2n(unsigned int n){
 } 
 
 void printbigint(bigint n){
-
+    for(int i = n.size-1; i >= 0; i--)
+        printf("%u",n.value[i]);
+    printf("\n");
 }
 
 char *biginttostr(bigint n){
