@@ -3,9 +3,10 @@
 int main(){
     bigint a,b;
 
-    initBigint(&a, "1288888822222");
-    initBigint(&b, "2222");
+    initBigint(&a, "1000000022222");
+    initBigint(&b, "2222000001000");
     
+
     printbigint(a);
     printbigint(b);
 
@@ -27,12 +28,15 @@ int main(){
     printbigint(s);
 
 
-    bigint *t = strtobigint("123");
+    bigint *t = strtobigint("120000001000003");
     printbigint(*t);
 
-    free(t);
-    // free(a.value);
-    // free(b.value);
+    char *w = biginttostr(a);
+    printf("str = %s\n",w);
+
+    // free(t);
+    free(a.value);
+    //free(b.value);
     // free(c.value);
     // free(d.value);
     // free(s.value);

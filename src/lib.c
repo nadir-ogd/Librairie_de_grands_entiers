@@ -1,12 +1,17 @@
 #include "./lib.h"
 
 //External functions
-unsigned int countDigits(unsigned int x) {
-    unsigned int count = 0;
+int countDigits(unsigned int x) {
+    if (x == 0) {
+        return 1;
+    }
+    int count = 0;
+
     while (x > 0) {
         x /= 10;
         count++;
     }
+
     return count;
 }
 
@@ -25,39 +30,43 @@ unsigned int power(unsigned int base, unsigned int exponent) {
 
 void initBigint(bigint *nb, const char *str) {
     int len = strlen(str);
+
     nb->size = (len + 8) / 9;//+8 : car la plus petite valeur pour len est 1
     nb->value = (unsigned int *)malloc(nb->size * sizeof(unsigned int));
+    
     if (nb->value == NULL) {
         fprintf(stderr, "Erreur d'allocation mémoire\n");
         exit(EXIT_FAILURE);
     }
 
-    for (unsigned int i = 0; i < nb->size; ++i) {
+    for (int i = 0; i < nb->size; i++) {
         nb->value[i] = 0;
     }
 
-    int ind = 0;
-    for (int i = len - 1; i >= 0; i -= 9) {
-        int temp = 0;
-        for (int j = i - 8; j <= i; ++j) {
-            if (j >= 0) {
-                temp = temp * 10 + (str[j] - '0');
-            }
-        }
-        nb->value[ind++] = temp;
+    int ind = nb->size-1;
+    
+    for (int i = 0; i < len; i += 9) {
+        unsigned int temp = 0;
+        int cond_j = (ind == 0) ? len : 9 * (i + 1);
+
+        for (int j = i; j < cond_j; j++)
+            temp = temp * 10 + (str[j] - '0');
+
+        nb->value[ind--] = temp;
     }
+
 }
 
 int cmp(bigint a, bigint b){
     unsigned int a_len = 0, b_len = 0;
 
-    for (unsigned int i = 0; i < a.size; i++)
+    for (int i = 0; i < a.size; i++)
         a_len += countDigits(a.value[i]);
-    for (unsigned int i = 0; i < b.size; i++)
+    for (int i = 0; i < b.size; i++)
         b_len += countDigits(b.value[i]);
     
     if (a_len > b_len){//a > b 
-        for(unsigned int i = 0; i < b.size; i++){
+        for(int i = 0; i < b.size; i++){
             if (a.value[i] != b.value[i]){
                 return (i+1);
             }
@@ -65,13 +74,13 @@ int cmp(bigint a, bigint b){
         return b.size;
     }
     else if (a_len < b_len) {//b > a
-        for(unsigned int i = 0; i < a.size; i++)
+        for(int i = 0; i < a.size; i++)
             if (a.value[i] != b.value[i])
                 return -(i+1);
         return -(a.size);
     }
     else{//a > b ou b < a
-        for(unsigned int i = 0; i < a.size; i++){
+        for(int i = 0; i < a.size; i++){
             if (a.value[i] > b.value[i])
                 return (i+1);
             if (a.value[i] < b.value[i])
@@ -92,7 +101,7 @@ bigint add(bigint a, bigint b) {
 
     c.value = (unsigned int *)malloc(c.size * sizeof(unsigned int));
 
-    for (unsigned int i = 0; i < c.size; i++) {
+    for (int i = 0; i < c.size; i++) {
         if (i < a.size)
             nb_digit_a = countDigits(a.value[i]);
         else
@@ -153,7 +162,7 @@ bigint sub(bigint a, bigint b){
     c.size = a.size;
     c.value = (unsigned int *)malloc(c.size * sizeof(unsigned int));
 
-    for (unsigned int i = 0; i < c.size; i++) {
+    for (int i = 0; i < c.size; i++) {
         nb_digit_a = (i < a.size) ? countDigits(a.value[i]) : 0;
         nb_digit_b = (i < b.size) ? countDigits(b.value[i]) : 0;
 
@@ -217,14 +226,32 @@ bigint pow2n(unsigned int n){
 } 
 
 void printbigint(bigint n){
+    char *s = biginttostr(n);
     for(int i = n.size-1; i >= 0; i--)
         printf("%u",n.value[i]);
     printf("\n");
 }
 
-char *biginttostr(bigint n){
+char *biginttostr(bigint n) {
+    int len = 0;
 
+    for (int i = 0; i < n.size; i++)
+        len += countDigits(n.value[i]);
+
+    char *str = (char *)malloc((len+1) * sizeof(char));
+    if (str == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int ind = 0;;
+    for (int i = n.size - 1; i >= 0; --i)
+        ind += snprintf(str + ind, len - countDigits(n.value[i]) + 1, "%u", n.value[i]);    
+    str[ind] = '\0'; 
+
+    return str;
 }
+
 
 bigint *strtobigint(char *s){
     int len = strlen(s);
@@ -238,7 +265,7 @@ bigint *strtobigint(char *s){
         exit(EXIT_FAILURE);
     }
 
-    for (unsigned int i = 0; i < n->size; ++i)
+    for (int i = 0; i < n->size; ++i)
         n->value[i] = 0;
 
     int ind = 0;

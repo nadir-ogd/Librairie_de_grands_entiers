@@ -14,7 +14,7 @@ unsigned int *value; /* valeur */
 /* External funcitons */
 void initBigint(bigint *nb, const char *str);
 unsigned int power(unsigned int base, unsigned int exponent);
-unsigned int countDigits(unsigned int x);
+int countDigits(unsigned int x);
 
 /* Operators */
 int cmp(bigint a, bigint b); /* Comparaison */
