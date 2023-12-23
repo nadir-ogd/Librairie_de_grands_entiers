@@ -3,8 +3,8 @@
 int main(){
     bigint a,b;
 
-    initBigint(&a, "1000000022222");
-    initBigint(&b, "2222000001000");
+    initBigint(&a, "1000001");
+    initBigint(&b, "1000001");
     
 
     printbigint(a);
@@ -17,10 +17,10 @@ int main(){
     printf("a + b = ");
     printbigint(c);
 
-    bigint d = sub(a, b);
-    printf("\n< SUBSTRACTION >\n");
-    printf("a - b = ");
-    printbigint(d);
+    // bigint d = sub(a, b);
+    // printf("\n< SUBSTRACTION >\n");
+    // printf("a - b = ");
+    // printbigint(d);
 
     bigint s = product(a, b);
     printf("\n< PRODUCT >\n");
@@ -31,9 +31,13 @@ int main(){
     bigint *t = strtobigint("120000001000003");
     printbigint(*t);
 
-    char *w = biginttostr(a);
-    printf("str = %s\n",w);
+    bigint q, m;
+    intdiv(a, b, &q, &m);
 
+    printf("\nQuotien :");
+    printbigint(q);
+    printf("\nModulo : ");
+    printbigint(m);
     // free(t);
     free(a.value);
     //free(b.value);

@@ -218,7 +218,61 @@ bigint product(bigint a, bigint b) {
 
 
 void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
+    if(cmp(a, b) == 0){//a = b => (a/b = 1) et (a%b = 0)
+        quotient->size = 1;
+        quotient->value = (unsigned int*)malloc(sizeof(unsigned int));
+        quotient->value[0] = 1;
 
+        modulo->size = 1;
+        modulo->value = (unsigned int*)malloc(sizeof(unsigned int));
+        modulo->value[0] = 0;
+    }
+
+    else if (cmp(a, b) < 0){//si a < b => (a/b = 0) et (a%b = b)
+        quotient->size = 1;
+        quotient->value = (unsigned int*)malloc(sizeof(unsigned int));
+        quotient->value[0] = 0;
+
+        modulo->size = a.size;
+        modulo->value = (unsigned int*)malloc(a.size * sizeof(unsigned int));
+        for(int i = 0; i < modulo->size; i++)
+            modulo->value[i] = a.value[i];
+    }
+
+    else{//a > b
+        quotient->size = 1;
+        quotient->value = (unsigned int*)calloc(quotient->size, sizeof(unsigned int));
+        
+        modulo->size = a.size;
+        modulo->value = (unsigned int*)malloc(modulo->size * sizeof(unsigned int));
+
+        for(int i = 0; i < a.size; i++){
+            modulo->value[i] = a.value[i];
+        }
+
+        for(int i = a.size-1; i >= 0; i--){
+            while(cmp(*modulo, b) >= 0){
+                (*quotient).value[i]++;
+                *modulo = sub(*modulo, b);
+            }
+            if (i > 0) {
+                (*modulo).value[i - 1] += power(10, 9) * (*modulo).value[i];
+                (*modulo).value[i] = 0;
+            }
+        }
+
+        // Supprimer les zéros non significatifs en tête du quotient
+        while ((*quotient).size >= 2 && (*quotient).value[(*quotient).size - 1] == 0) {
+            (*quotient).size--;
+            (*quotient).value = (unsigned int *)realloc((*quotient).value, (*quotient).size * sizeof(unsigned int));
+           
+            if ((*quotient).value == NULL) {
+                fprintf(stderr, "Erreur d'allocation mémoire\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+    }
 }
 
 bigint pow2n(unsigned int n){
