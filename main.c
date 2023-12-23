@@ -38,6 +38,12 @@ int main(){
     printbigint(q);
     printf("\nModulo : ");
     printbigint(m);
+
+    int n = 100;
+    bigint p = pow2n(n);
+    printf("size of p = %d\n",p.size);
+    printf("\n2 ** %d = ",n);
+    printbigint(p);
     // free(t);
     free(a.value);
     //free(b.value);

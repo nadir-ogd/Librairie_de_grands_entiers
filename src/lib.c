@@ -1,4 +1,5 @@
 #include "./lib.h"
+#include <math.h>
 
 //External functions
 int countDigits(unsigned int x) {
@@ -271,16 +272,51 @@ void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
                 exit(EXIT_FAILURE);
             }
         }
-
     }
 }
 
 bigint pow2n(unsigned int n){
+    bigint p;
+    double logBase2 = log2(power(2, 9));
 
+    p.size = (int)ceil(n / logBase2);
+    p.value = (unsigned int*) calloc(p.size, sizeof(unsigned int));
+   
+    if(p.value  == NULL){
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        exit(EXIT_FAILURE);
+    }
+
+    p.value[0] = 1;
+    for (unsigned int i = 1; i < p.size; i++)
+        p.value[i] = 0;
+
+    for (unsigned int i = 0; i < n; ++i) {
+        unsigned int carry = 0;
+
+        for (unsigned int j = 0; j < p.size; ++j) {
+            unsigned long long tmp = (unsigned long long)p.value[j] * 2 + carry;
+            p.value[j] = (unsigned int)(tmp % power(10, 9));
+            carry = (unsigned int)(tmp / power(10, 9));
+        }
+
+        if (carry > 0)
+            p.value[p.size++] = carry;
+    }
+
+    while (p.size > 1 && p.value[p.size - 1] == 0) {
+        p.size--;
+        p.value = (unsigned int*)realloc(p.value, p.size * sizeof(unsigned int));
+        if (p.value == NULL) {
+            fprintf(stderr, "Erreur d'allocation mémoire\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    return p;     
 } 
 
 void printbigint(bigint n){
-    char *s = biginttostr(n);
     for(int i = n.size-1; i >= 0; i--)
         printf("%u",n.value[i]);
     printf("\n");

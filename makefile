@@ -6,7 +6,7 @@ SRC = main.c $(wildcard src/*.c)
 OBJ = $(patsubst main.o, obj/main.o, $(patsubst src/%, obj/%, $(patsubst %.c, %.o, $(SRC))))
 
 main: $(OBJ)
-	$(CC) $^ $(OPT) -o $@
+	$(CC) $^ $(OPT) -o $@ -lm
 
 obj/%.o: src/%.c include/%.h
 	$(CC) -c $< $(CFLAGS) -o $@
