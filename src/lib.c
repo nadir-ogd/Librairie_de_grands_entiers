@@ -265,18 +265,20 @@ bigint *strtobigint(char *s){
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; i < n->size; ++i)
+    for (int i = 0; i < n->size; i++) {
         n->value[i] = 0;
+    }
 
-    int ind = 0;
-    for (int i = len - 1; i >= 0; i -= 9) {
-        int temp = 0;
-        for (int j = i - 8; j <= i; ++j) {
-            if (j >= 0) {
-                temp = temp * 10 + (s[j] - '0');
-            }
-        }
-        n->value[ind++] = temp;
+    int ind = n->size-1;
+    
+    for (int i = 0; i < len; i += 9) {
+        unsigned int tmp = 0;
+        int cond_j = (ind == 0) ? len : 9 * (i + 1);
+
+        for (int j = i; j < cond_j; j++)
+            tmp = tmp * 10 + (s[j] - '0');
+
+        n->value[ind--] = tmp;
     }
 
     return n;
