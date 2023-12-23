@@ -39,7 +39,7 @@ int main(){
     printf("\nModulo : ");
     printbigint(m);
 
-    int n = 100;
+    int n = 5000;
     bigint p = pow2n(n);
     printf("size of p = %d\n",p.size);
     printf("\n2 ** %d = ",n);
