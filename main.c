@@ -1,63 +1,70 @@
 #include "lib_big_int.h"
 
+int Mersenne(unsigned int n) {
+    bigint Mn, S, two, one;
+    initBigint(&Mn, "0");
+    initBigint(&S, "4");//S(1) = 4
+    initBigint(&two, "2");
+    initBigint(&one, "1");
+
+    // Calcul de M_n = 2^n - 1
+    Mn = sub(pow2n(n), one);
+    printf("M_n (2^n - 1) = ");
+    printbigint(Mn);
+
+    // Test de Lucas-Lehmer
+    for (unsigned int k = 2; k < n; k++) {
+        bigint Sk = product(S, S);
+        printf("Sk à l'itération %u = ",k);
+        printbigint(Sk);
+        printf("\n");
+        S = sub(Sk, two);
+    }
+
+    printf("S(p-1) = ");
+    printbigint(S);
+
+    // Vérification si le résultat final est nul
+    bigint q,r;
+    intdiv(S, Mn, &q, &r);
+    printf("\nQuotien : ");
+    printbigint(q);
+    printf("\nModulo : ");
+    printbigint(r);
+
+    int result = (r.size == 1 && r.value[0] == 0);
+
+    // Libération de la mémoire allouée
+    free(Mn.value);
+    free(S.value);
+    free(two.value);
+    free(one.value);
+
+    return result;
+}
+
 int main(){
-    bigint a,b;
-
-    initBigint(&a, "10000012222222223333333");
-    initBigint(&b, "10000011115555555599999");
     
+    unsigned int n = 9;
+    int result = Mersenne(n);
+    
+    if (result) 
+        printf("2^%u - 1 est un nombre premier de Mersenne.\n", n);
+    else
+        printf("2^%u - 1 n'est pas un nombre premier de Mersenne.\n", n);
+    // bigint a,b;
+    // initBigint(&a, "11111111111");
+    // b = pow2n(50);
 
-    printbigint(a);
-    printbigint(b);
-
-    // printf("cmp(a, b) = %d\n",cmp(a, b));
-
-    // bigint c = add(a, b);
-    // printf("\n< ADDITION >\n");
-    // printf("a + b = ");
-    // printbigint(c);
-
-    // // bigint d = sub(a, b);
-    // // printf("\n< SUBSTRACTION >\n");
-    // // printf("a - b = ");
-    // // printbigint(d);
-
-    // bigint s = product(a, b);
-    // printf("\n< PRODUCT >\n");
-    // printf("a * b = ");
-    // printbigint(s);
-
-
-    // bigint *t = strtobigint("120000001000003");
-    // printbigint(*t);
+    // // bigint s = product(a, b);
+    // // printbigint(s);
 
     // bigint q, m;
-    // intdiv(a, b, &q, &m);
+    // intdiv(b, a, &q, &m);
 
-    // printf("\nQuotien :");
+    // printf("\nQuotien : ");
     // printbigint(q);
     // printf("\nModulo : ");
     // printbigint(m);
-
-    // int n = 6;
-    // bigint p = pow2n(n);
-
-    char *s0 = biginttostr(a);
-    printf("a en string = %s\n",s0);
-
-    char *s = biginttosubstr(a, 0, 1);
-    printf("a entre pos 1 et pos 2 = %s\n",s);
-
-    char *s2 = biginttosubstr(a, 0, 2);
-    printf("b entre pos 0 et pos 2 = %s\n",s2);
-    // printf("size of p = %d\n",p.size);
-    // printf("\n2 ** %d = ",n);
-    // printbigint(p);
-    // // free(t);
-    // free(a.value);
-    //free(b.value);
-    // free(c.value);
-    // free(d.value);
-    // free(s.value);
 
     }

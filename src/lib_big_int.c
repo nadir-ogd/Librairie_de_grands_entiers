@@ -1,5 +1,4 @@
 #include "./lib_big_int.h"
-#include <math.h>
 
 //External functions
 int countDigits(unsigned int x) {
@@ -55,8 +54,8 @@ void initBigint(bigint *nb, const char *str) {
 
         nb->value[ind--] = temp;
     }
-
 }
+
 
 int cmp(bigint a, bigint b){
     unsigned int a_len = 0, b_len = 0;
@@ -218,47 +217,78 @@ bigint product(bigint a, bigint b) {
 }
 
 
-void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
-    if(cmp(a, b) == 0){//a = b => (a/b = 1) et (a%b = 0)
-        quotient->size = 1;
-        quotient->value = (unsigned int*)malloc(sizeof(unsigned int));
-        quotient->value[0] = 1;
-
-        modulo->size = 1;
-        modulo->value = (unsigned int*)malloc(sizeof(unsigned int));
-        modulo->value[0] = 0;
-    }
-
-    else if (cmp(a, b) < 0){//si a < b => (a/b = 0) et (a%b = b)
-        quotient->size = 1;
-        quotient->value = (unsigned int*)malloc(sizeof(unsigned int));
-        quotient->value[0] = 0;
-
-        modulo->size = a.size;
-        modulo->value = (unsigned int*)malloc(a.size * sizeof(unsigned int));
-        for(int i = 0; i < modulo->size; i++)
-            modulo->value[i] = a.value[i];
-    }
-
-    else{//a > b
-        quotient->size = 1;
-        quotient->value = (unsigned int*)calloc(quotient->size, sizeof(unsigned int));
+// void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
+//      if (cmp(a, b) == 0) {
+//         // a = b => (a/b = 1) et (a%b = 0)
+//         initBigint(quotient, "1");
+//         initBigint(modulo, "0");
+//     } else if (cmp(a, b) < 0) {
+//         // a < b => (a/b = 0) et (a%b = a)
+//         initBigint(quotient, "0");
+//         initBigint(modulo, biginttostr(a));
+//     } else{//a > b
+//         initBigint(quotient, "1");
         
-        modulo->size = a.size;
-        modulo->value = (unsigned int*)malloc(modulo->size * sizeof(unsigned int));
+//         initBigint(modulo, biginttostr(a));
 
-        for(int i = 0; i < a.size; i++){
+//         for(int i = 0; i < a.size; i++){
+//             modulo->value[i] = a.value[i];
+//         }
+
+//         for(int i = a.size-1; i >= 0; i--){
+//             while(cmp(*modulo, b) >= 0){
+//                 (*quotient).value[i]++;
+//                 *modulo = sub(*modulo, b);
+//             }
+//             if (i > 0) {
+//                 (*modulo).value[i - 1] += power(10, 9) * (*modulo).value[i];
+//                 (*modulo).value[i] = 0;
+//             }
+//         }
+
+//         // Supprimer les zéros non significatifs en tête du quotient
+//         while ((*quotient).size >= 2 && (*quotient).value[(*quotient).size - 1] == 0) {
+//             (*quotient).size--;
+//             (*quotient).value = (unsigned int *)realloc((*quotient).value, (*quotient).size * sizeof(unsigned int));
+           
+//             if ((*quotient).value == NULL) {
+//                 fprintf(stderr, "Erreur d'allocation mémoire\n");
+//                 exit(EXIT_FAILURE);
+//             }
+//         }
+//     }
+// }
+
+void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo) {
+    if (cmp(a, b) == 0) {
+        // a = b => (a/b = 1) et (a%b = 0)
+        initBigint(quotient, "1");
+        initBigint(modulo, "0");
+    } else if (cmp(a, b) < 0) {
+        // a < b => (a/b = 0) et (a%b = a)
+        initBigint(quotient, "0");
+        initBigint(modulo, biginttostr(a));
+    } else { // a > b
+        initBigint(quotient, "0");
+        initBigint(modulo, biginttostr(a));
+
+        for (int i = 0; i < a.size; i++) {
             modulo->value[i] = a.value[i];
         }
 
-        for(int i = a.size-1; i >= 0; i--){
-            while(cmp(*modulo, b) >= 0){
+        for (int i = a.size - 1; i >= 0; i--) {
+            while (cmp(*modulo, b) >= 0) {
                 (*quotient).value[i]++;
                 *modulo = sub(*modulo, b);
             }
+
             if (i > 0) {
-                (*modulo).value[i - 1] += power(10, 9) * (*modulo).value[i];
-                (*modulo).value[i] = 0;
+                unsigned int carry = 0;
+                for (int j = 0; j <= i; j++) {
+                    unsigned long long temp = (unsigned long long)(*modulo).value[j] + (unsigned long long)1000000000 * carry;
+                    (*modulo).value[j] = (unsigned int)(temp % 1000000000);
+                    carry = (unsigned int)(temp / 1000000000);
+                }
             }
         }
 
@@ -266,7 +296,7 @@ void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
         while ((*quotient).size >= 2 && (*quotient).value[(*quotient).size - 1] == 0) {
             (*quotient).size--;
             (*quotient).value = (unsigned int *)realloc((*quotient).value, (*quotient).size * sizeof(unsigned int));
-           
+
             if ((*quotient).value == NULL) {
                 fprintf(stderr, "Erreur d'allocation mémoire\n");
                 exit(EXIT_FAILURE);
