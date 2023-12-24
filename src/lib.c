@@ -318,7 +318,7 @@ bigint pow2n(unsigned int n){
 
 void printbigint(bigint n){
     for(int i = n.size-1; i >= 0; i--)
-        printf("%u",n.value[i]);
+        printf("%u ",n.value[i]);
     printf("\n");
 }
 
@@ -336,10 +336,7 @@ char *biginttostr(bigint n) {
 
     int ind = 0;;
     for (int i = n.size - 1; i >= 0; --i){
-        if(i == n.size -1)
-            ind += sprintf(str + ind, "%u", n.value[i]);    
-        else
-            ind += sprintf(str + ind, "%09u", n.value[i]);
+        ind += sprintf(str + ind, "%u", n.value[i]);    
     }
     str[ind] = '\0'; 
 
@@ -379,13 +376,16 @@ bigint *strtobigint(char *s){
 }
 
 char *biginttosubstr(bigint n, int first, int last){
+    if (first > last) {
+        fprintf(stderr, "First doit etre inferieur ou égal à Last\n");
+        exit(EXIT_FAILURE);
+    }        
+    
     int len = 0;
     for (int i = 0; i < n.size; i++)
         len += countDigits(n.value[i]);
     
-    n.size = (len + 8)/9;
-    n.value = (unsigned int *)malloc(n.size * sizeof(unsigned int));
-    
+
     if (n.value == NULL) {
         fprintf(stderr, "Erreur d'allocation mémoire\n");
         exit(EXIT_FAILURE);
@@ -394,12 +394,9 @@ char *biginttosubstr(bigint n, int first, int last){
     int ind = 0;
     char *str = (char *)malloc((last-first+1)*9*sizeof(char));
     
-    for(int i = last; i >= first; i--){
-        if (i == n.size - 1)
-            ind += sprintf(str + ind, "%u", n.value[i]);
-        else 
-            ind += sprintf(str + ind, "%09u", n.value[i]);
-    }
+    for(int i = last; i >= first; i--)
+        ind += sprintf(str + ind, "%u", n.value[i]);
+    
 
     str[ind] = '\0';
     return str;
