@@ -1,4 +1,4 @@
-#include "./lib.h"
+#include "./lib_big_int.h"
 #include <math.h>
 
 //External functions

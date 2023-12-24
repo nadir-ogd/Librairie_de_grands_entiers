@@ -1,5 +1,5 @@
-#ifndef LIB_H
-#define LIB_H
+#ifndef LIB_BIH_INT_H
+#define LIB__BIG_INT_H
 
 #include <stdio.h>
 #include <stdlib.h>
