@@ -209,7 +209,7 @@ bigint product(bigint a, bigint b) {
     }
     
     // Retirer les zéros non significatifs à gauche
-    while (c.size >= 2 && c.value[c.size - 1] == 0){//la taille de bigint doit etre au moin 1
+    while (c.size >= 2 && c.value[c.size - 1] == 0){//la taille de bigint doit etre au moins 1
         c.size--;
         c.value = realloc(c.value, c.size * sizeof(unsigned int));
     }
@@ -335,8 +335,12 @@ char *biginttostr(bigint n) {
     }
 
     int ind = 0;;
-    for (int i = n.size - 1; i >= 0; --i)
-        ind += snprintf(str + ind, len - countDigits(n.value[i]) + 1, "%u", n.value[i]);    
+    for (int i = n.size - 1; i >= 0; --i){
+        if(i == n.size -1)
+            ind += sprintf(str + ind, "%u", n.value[i]);    
+        else
+            ind += sprintf(str + ind, "%09u", n.value[i]);
+    }
     str[ind] = '\0'; 
 
     return str;
@@ -375,5 +379,28 @@ bigint *strtobigint(char *s){
 }
 
 char *biginttosubstr(bigint n, int first, int last){
+    int len = 0;
+    for (int i = 0; i < n.size; i++)
+        len += countDigits(n.value[i]);
+    
+    n.size = (len + 8)/9;
+    n.value = (unsigned int *)malloc(n.size * sizeof(unsigned int));
+    
+    if (n.value == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        exit(EXIT_FAILURE);
+    }
 
+    int ind = 0;
+    char *str = (char *)malloc((last-first+1)*9*sizeof(char));
+    
+    for(int i = last; i >= first; i--){
+        if (i == n.size - 1)
+            ind += sprintf(str + ind, "%u", n.value[i]);
+        else 
+            ind += sprintf(str + ind, "%09u", n.value[i]);
+    }
+
+    str[ind] = '\0';
+    return str;
 }
