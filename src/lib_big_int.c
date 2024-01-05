@@ -28,33 +28,38 @@ unsigned int power(unsigned int base, unsigned int exponent) {
     return result;
 }
 
-void initBigint(bigint *nb, const char *str) {
-    int len = strlen(str);
-
-    nb->size = (len + 8) / 9;//+8 : car la plus petite valeur pour len est 1
-    nb->value = (unsigned int *)malloc(nb->size * sizeof(unsigned int));
-    
-    if (nb->value == NULL) {
-        fprintf(stderr, "Erreur d'allocation mémoire\n");
-        exit(EXIT_FAILURE);
-    }
-
-    for (int i = 0; i < nb->size; i++) {
-        nb->value[i] = 0;
-    }
-
-    int ind = nb->size-1;
-    
-    for (int i = 0; i < len; i += 9) {
-        unsigned int temp = 0;
-        int cond_j = (ind == 0) ? len : 9 * (i + 1);
-
-        for (int j = i; j < cond_j; j++)
-            temp = temp * 10 + (str[j] - '0');
-
-        nb->value[ind--] = temp;
-    }
+void freebigint(bigint *num) {
+    free(num->value);
+    num->size = 0;
 }
+
+// void initBigint(bigint *nb, const char *str) {
+//     int len = strlen(str);
+
+//     nb->size = (len + 8) / 9;//+8 : car la plus petite valeur pour len est 1
+//     nb->value = (unsigned int *)malloc(nb->size * sizeof(unsigned int));
+    
+//     if (nb->value == NULL) {
+//         fprintf(stderr, "Erreur d'allocation mémoire\n");
+//         exit(EXIT_FAILURE);
+//     }
+
+//     for (int i = 0; i < nb->size; i++) {
+//         nb->value[i] = 0;
+//     }
+
+//     int ind = nb->size-1;
+    
+//     for (int i = 0; i < len; i += 9) {
+//         unsigned int temp = 0;
+//         int cond_j = (ind == 0) ? len : 9 * (i + 1);
+
+//         for (int j = i; j < cond_j; j++)
+//             temp = temp * 10 + (str[j] - '0');
+
+//         nb->value[ind--] = temp;
+//     }
+// }
 
 
 int cmp(bigint a, bigint b){
@@ -262,15 +267,15 @@ bigint product(bigint a, bigint b) {
 void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo) {
     if (cmp(a, b) == 0) {
         // a = b => (a/b = 1) et (a%b = 0)
-        initBigint(quotient, "1");
-        initBigint(modulo, "0");
+        quotient = strtobigint("1");
+        modulo = strtobigint("0");
     } else if (cmp(a, b) < 0) {
         // a < b => (a/b = 0) et (a%b = a)
-        initBigint(quotient, "0");
-        initBigint(modulo, biginttostr(a));
+        quotient = strtobigint("0");
+        modulo = strtobigint(biginttostr(a));
     } else { // a > b
-        initBigint(quotient, "0");
-        initBigint(modulo, biginttostr(a));
+        quotient = strtobigint("0");
+        modulo = strtobigint(biginttostr(a));
 
         for (int i = 0; i < a.size; i++) {
             modulo->value[i] = a.value[i];
