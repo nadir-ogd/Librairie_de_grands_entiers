@@ -6,6 +6,8 @@
 #include <string.h>
 #include <math.h>
 
+/* --- Part 1 Functions --- */
+
 /* Type bigint */
 typedef struct bigint {
 unsigned int size; /* taille */
@@ -31,5 +33,8 @@ void printbigint(bigint n);
 char *biginttostr(bigint n);
 bigint *strtobigint(char *s);
 char *biginttosubstr(bigint n, int first, int last);
+
+/* --- Part 2 Function --- */
+int Mersenne(unsigned int n); //Retourne 1 si 2^n - 1 est un nombre premier de Mersenne, 0 sinon
 
 #endif

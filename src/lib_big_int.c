@@ -338,7 +338,6 @@ char *biginttostr(bigint n) {
     return str;
 }
 
-
 bigint *strtobigint(char *s){
     int len = strlen(s);
     
@@ -401,4 +400,59 @@ char *biginttosubstr(bigint n, int first, int last){
 
     str[ind] = '\0';
     return str;
+}
+
+int Mersenne(unsigned int n) {
+    bigint Mn, S, two, one;
+    int result;
+    initBigint(&Mn , "0");
+    initBigint(&S, "4");//S(1) = 4
+    initBigint(&two, "2");
+    initBigint(&one, "1");
+
+    // Calcul de M_n = 2^n - 1
+    Mn = sub(pow2n(n), one);
+    printf("M_n (2^n - 1) = ");
+    printbigint(Mn);
+
+    // Test de Lucas-Lehmer
+    if (n > 2){
+        for (unsigned int k = 2; k < n; k++) {
+            bigint Sk = product(S, S);
+            S = sub(Sk, two);
+            printf("Sk à l'itération %u = ",k);
+            printbigint(S);
+            printf("\n");
+        }
+
+        printf("S(p-1) = ");
+        printbigint(S);
+
+        // Vérification si le résultat final est nul
+        bigint q,r;
+        intdiv(S, Mn, &q, &r);
+        printf("\nQuotien : ");
+        printbigint(q);
+        printf("\nModulo : ");
+        printbigint(r);
+
+        result = (r.size == 1 && r.value[0] == 0);
+        printf("result = %d\n",result);
+        freebigint(&r);
+        freebigint(&q);
+    }
+    else{
+        if(n == 2)
+            result = 1;
+        else
+            result = 0;
+    }
+
+    // Libération de la mémoire allouée
+    freebigint(&Mn);
+    freebigint(&S);
+    freebigint(&two);
+    freebigint(&one);
+
+    return result;
 }
