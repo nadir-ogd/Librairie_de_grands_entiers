@@ -308,8 +308,12 @@ bigint pow2n(unsigned int n){
 } 
 
 void printbigint(bigint n){
-    for(int i = n.size-1; i >= 0; i--)
-        printf("%u ",n.value[i]);
+    for(int i = n.size-1; i >= 0; i--){
+        if(i == n.size-1)
+            printf("%u ",n.value[i]);
+        else 
+            printf("%09u ",n.value[i]);
+    }
     printf("\n");
 }
 
