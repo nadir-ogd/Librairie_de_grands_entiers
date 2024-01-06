@@ -71,11 +71,10 @@ void initBigint(bigint *nb, const char *str) {
 int cmp(bigint a, bigint b){
     unsigned int a_len = 0, b_len = 0;
 
-    for (int i = 0; i < a.size; i++)
-        a_len += countDigits(a.value[i]);
-    for (int i = 0; i < b.size; i++)
-        b_len += countDigits(b.value[i]);
-    
+    //si size > 1 tous les blocs sont a 9 chiffres sauf le dernier(9 au plus)
+    a_len += 9 * (a.size-1) + countDigits(a.value[a.size-1]);
+    b_len += 9 * (b.size-1) + countDigits(b.value[b.size-1]);
+
     if (a_len > b_len){//a > b 
         for(int i = 0; i < b.size; i++){
             if (a.value[i] != b.value[i]){
@@ -91,12 +90,15 @@ int cmp(bigint a, bigint b){
         return -(a.size);
     }
     else{//a > b ou b < a
-        for(int i = 0; i < a.size; i++){
-            if (a.value[i] > b.value[i])
-                return (i+1);
-            if (a.value[i] < b.value[i])
-                return -(i+1);
-        }
+        int signe;
+        if (a.value[a.size-1] > b.value[b.size-1])
+            signe = 1;
+        else if (a.value[a.size-1] < b.value[b.size-1])
+            signe = -1;
+             
+        for(int i = 0; i < a.size; i++)
+            if (a.value[i] != b.value[i])
+                return (i+1)*signe;
     }
     return 0; 
 }
