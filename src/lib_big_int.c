@@ -230,8 +230,8 @@ bigint product(bigint a, bigint b) {
 }
 
 
-void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo) {
-    if (cmp(a, b) == 0) {
+void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
+     if (cmp(a, b) == 0) {
         // a = b => (a/b = 1) et (a%b = 0)
         initBigint(quotient, "1");
         initBigint(modulo, "0");
@@ -239,51 +239,32 @@ void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo) {
         // a < b => (a/b = 0) et (a%b = a)
         initBigint(quotient, "0");
         initBigint(modulo, biginttostr(a));
-    } else {
-        // a > b
+    } else{//a > b
+        bigint one;
+        initBigint(&one, "1");
         initBigint(quotient, "0");
         initBigint(modulo, biginttostr(a));
 
-        bigint temp;
-        initBigint(&temp, "0");
+        for(int i = 0; i < a.size; i++)
+            modulo->value[i] = a.value[i];
 
-        for (int i = a.size - 1; i >= 0; i--) {
-            unsigned int currentDigit = a.value[i];
-            temp.size = 1;
-            temp.value[0] = currentDigit;
-
-            while (cmp(temp, b) >= 0) {
-                // (*quotient) += power(10, 9 * i);
-                unsigned int carry = 0;
-                for (int j = 0; j <= i; j++) {
-                    unsigned long long tempSum = (unsigned long long)(*quotient).value[j] +
-                                                  (unsigned long long)carry +
-                                                  (unsigned long long)power(10, 9 * i);
-                    (*quotient).value[j] = (unsigned int)(tempSum % power(10, 9));
-                    carry = (unsigned int)(tempSum / power(10, 9));
-                }
-
-                // temp = temp - b;
-                bigint tempB = b;
-                while (cmp(temp, tempB) >= 0) {
-                    tempB = add(tempB, b);
-                    temp = sub(temp, b);
-                }
-            }
+        while(cmp(*modulo, b) >= 0){
+            *quotient = add(*quotient, one);
+            *modulo = sub(*modulo, b);
         }
+    }
 
-        for(int i = 0; i < temp.size; i++)
-            modulo->value[i] = temp.value[i];
-
-        // Supprimer les zéros non significatifs en tête du quotient
-        while ((*quotient).size >= 2 && (*quotient).value[(*quotient).size - 1] == 0) {
-            (*quotient).size--;
+    // Supprimer les zéros non significatifs en tête du quotient
+    while ((*quotient).size >= 2 && (*quotient).value[(*quotient).size - 1] == 0) {
+        (*quotient).size--;
+        (*quotient).value = (unsigned int *)realloc((*quotient).value, (*quotient).size * sizeof(unsigned int));
+        
+        if ((*quotient).value == NULL) {
+            fprintf(stderr, "Erreur d'allocation mémoire\n");
+            exit(EXIT_FAILURE);
         }
-
-        freebigint(&temp);
     }
 }
-
 
 bigint pow2n(unsigned int n){
     bigint p;
