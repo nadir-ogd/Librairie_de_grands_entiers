@@ -1,6 +1,5 @@
 #include "./lib_big_int.h"
 
-//External functions
 int countDigits(unsigned int x) {
     if (x == 0) {
         return 1;
@@ -90,11 +89,13 @@ int cmp(bigint a, bigint b){
         return -(a.size);
     }
     else{//a > b ou b < a
-        int signe;
-        if (a.value[a.size-1] > b.value[b.size-1])
-            signe = 1;
-        else if (a.value[a.size-1] < b.value[b.size-1])
-            signe = -1;
+        int signe, i = a.size-1;
+        //Pour savoir qui le plus grand entre A et B avant de trouver la position du premier bloc différent
+        while (i >= 0 && a.value[i] == b.value[i])
+            i--;
+
+        if (i >= 0)
+            signe = (a.value[i] > b.value[i]) ? 1 : -1;
              
         for(int i = 0; i < a.size; i++)
             if (a.value[i] != b.value[i])
@@ -167,9 +168,10 @@ bigint sub(bigint a, bigint b){
     bigint c;
     unsigned int borrow = 0, nb_digit_a, nb_digit_b, max_nb_digits;
 
-    if (cmp(a, b) < 0) {
+    if (cmp(a, b) < 0) { //a doit etre sup ou égal à b
         fprintf(stderr, "Erreur : a doit être supérieur ou égal à b pour la soustraction.\n");
-        exit(EXIT_FAILURE);
+        initBigint(&c, "-1");
+        return c;
     }
 
     c.size = a.size;
@@ -221,7 +223,7 @@ bigint product(bigint a, bigint b) {
     }
     
     // Retirer les zéros non significatifs à gauche
-    while (c.size >= 2 && c.value[c.size - 1] == 0){//la taille de bigint doit etre au moins 1
+    while (c.size >= 2 && c.value[c.size - 1] == 0){//cond d'arret : la taille de bigint doit etre inf ou égal à 1
         c.size--;
         c.value = realloc(c.value, c.size * sizeof(unsigned int));
     }
@@ -231,15 +233,13 @@ bigint product(bigint a, bigint b) {
 
 
 void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
-     if (cmp(a, b) == 0) {
-        // a = b => (a/b = 1) et (a%b = 0)
+     if (cmp(a, b) == 0) {// a = b => (a/b = 1) et (a%b = 0)
         initBigint(quotient, "1");
         initBigint(modulo, "0");
-    } else if (cmp(a, b) < 0) {
-        // a < b => (a/b = 0) et (a%b = a)
+    } else if (cmp(a, b) < 0) {// a < b => (a/b = 0) et (a%b = a)
         initBigint(quotient, "0");
         initBigint(modulo, biginttostr(a));
-    } else{//a > b
+    } else{//a > b => (a/b = q) et (a%b = r)
         bigint one;
         initBigint(&one, "1");
         initBigint(quotient, "0");
@@ -248,7 +248,7 @@ void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
         for(int i = 0; i < a.size; i++)
             modulo->value[i] = a.value[i];
 
-        while(cmp(*modulo, b) >= 0){
+        while(cmp(*modulo, b) >= 0){//ca prend plus de temps pour des a et b grands
             *quotient = add(*quotient, one);
             *modulo = sub(*modulo, b);
         }
@@ -290,11 +290,12 @@ bigint pow2n(unsigned int n){
             p.value[j] = (unsigned int)(tmp % power(10, 9));
             carry = (unsigned int)(tmp / power(10, 9));
         }
-
+        //cas d'une retenue
         if (carry > 0)
             p.value[p.size++] = carry;
     }
 
+    // Supprimer les zéros non significatifs
     while (p.size > 1 && p.value[p.size - 1] == 0) {
         p.size--;
         p.value = (unsigned int*)realloc(p.value, p.size * sizeof(unsigned int));
@@ -320,8 +321,7 @@ void printbigint(bigint n){
 char *biginttostr(bigint n) {
     int len = 0;
 
-    for (int i = 0; i < n.size; i++)
-        len += countDigits(n.value[i]);
+    len += 9 * (n.size-1) + countDigits(n.value[n.size-1]);
 
     char *str = (char *)malloc((len+1) * sizeof(char));
     if (str == NULL) {
@@ -381,25 +381,24 @@ char *biginttosubstr(bigint n, int first, int last){
         exit(EXIT_FAILURE);
     }        
     
-    int len = 0;
-    for (int i = 0; i < n.size; i++)
-        len += countDigits(n.value[i]);
-    
+    char *fullstr = biginttostr(n);
+    int len = last - first + 1;
 
-    if (n.value == NULL) {
+    char *substr = (char *)malloc((len + 1) * sizeof(char)); // +1 pour le '\0'
+    if (substr == NULL) {
         fprintf(stderr, "Erreur d'allocation mémoire\n");
         exit(EXIT_FAILURE);
     }
 
     int ind = 0;
-    char *str = (char *)malloc((last-first+1)*9*sizeof(char));
-    
-    for(int i = last; i >= first; i--)
-        ind += sprintf(str + ind, "%u", n.value[i]);
-    
+    for (int i = first; i <= last; i++) {
+        substr[ind++] = fullstr[i];
+    }
 
-    str[ind] = '\0';
-    return str;
+    substr[ind] = '\0';
+    free(fullstr);
+
+    return substr;
 }
 
 int Mersenne(unsigned int n) {
@@ -428,10 +427,10 @@ int Mersenne(unsigned int n) {
         freebigint(&r);
         freebigint(&q);
     }
-    else{
+    else{ //cas de 2^(n-1) = 3
         if(n == 2)
             result = 1;
-        else
+        else//Cas particuliers pour 0 et 1 (non premiers)
             result = 0;
     }
 
@@ -465,7 +464,163 @@ char* randomString() {
 }
 
 void tests_1() {
-    int nbFunctions = 10;
+    int nbFunctions = 9;//Toutes les fonctions sauf printbigint
+    
+    for(int i = 0; i < nbFunctions; i++){
+        switch ((i)){//tester une fonction pour dans chaque case
+        case 0:
+            bigint A,B;
+            initBigint(&A, randomString());
+            initBigint(&B, randomString());
+            printf("Testing cmp Function : \n");
+            printf("A = ");
+            printbigint(A);
+            printf("B = ");
+            printbigint(B);
+            printf("cmp(A, B) = %d\n", cmp(A,B));
+            break;
+        
+        case 1:
+            printf("\nTesting add Function : \n");
+            bigint C;
+        
+            printf("A = ");
+            printbigint(A);
+            printf("B = ");
+            printbigint(B);
 
-    for(int i = 0; i < ) 
+            C = add(A, B);
+            printf("add(A, B) = C\n");
+            printf("C = ");
+            printbigint(C);
+            break;
+        
+        case 2:
+            printf("\nTesting sub Function : \n");
+
+            printf("A = ");
+            printbigint(A);
+            printf("B = ");
+            printbigint(B);
+
+            C = sub(A, B);
+            printf("sub(A, B) = C\n");
+            printf("C = ");
+            printbigint(C);
+            break;
+
+        case 3:
+            printf("\nTesting product Function : \n");
+
+            printf("A = ");
+            printbigint(A);
+            printf("B = ");
+            printbigint(B);
+
+            C = product(A, B);
+            printf("product(A, B) = C\n");
+            printf("C = ");
+            printbigint(C);
+            break;
+        
+        case 4:
+            printf("\nTesting intdiv Function : \n");
+
+            bigint q, r;
+            //éviter le random car la division prend beaucoup de temps sur les longs nombres
+            initBigint(&A, "11111111111111111111111");
+            printf("A = ");
+            printbigint(A);
+            initBigint(&B, "1000000000000000000000");
+            printf("B = ");
+            printbigint(B);
+
+            intdiv(A, B, &q, &r);
+            printf("inddiv(A, B, q, r) :\n");
+            printf("q = ");
+            printbigint(q);
+
+            printf("r = ");
+            printbigint(r);
+
+            freebigint(&q);
+            freebigint(&r);
+            break;
+        
+        case 5:
+            printf("\nTesting pow2n Function : \n");
+
+            unsigned int n = rand() % 1000;//On peut aller jusqu'à n = 1000000
+            C = pow2n(n);
+            printf("C = 2^%u\n",n);
+            printf("C = ");
+            printbigint(C);
+
+            break;
+        
+        case 6:
+            printf("\nTesting biginttostr Function : \n");
+            char *s;
+
+            initBigint(&A, randomString());
+            printf("A = ");
+            printbigint(A);
+
+            printf("Convertion du bigint A -> string s\n");
+
+            s = biginttostr(A);
+            printf("s = %s\n",s);
+
+            break;
+        
+        case 7:
+            printf("\nTesting strtobigint Function : \n");
+            bigint *F;
+            s = randomString();
+            printf("s = %s\n",s);
+            
+            printf("Convertion du string s -> Bigint F\n");
+            F = strtobigint(s);
+
+            printf("F = ");
+            printbigint(*F);
+
+            break;
+
+        case 8:
+            printf("\nTesting biginttosubstr Function : \n");
+
+            int first, last;
+            char *a_string = randomString();
+            
+            initBigint(&A, a_string);
+            printf("A = ");
+            printbigint(A);
+
+            first = rand() % strlen(a_string);
+            last = first + rand() % (strlen(a_string) - first);
+
+            printf("str = String entre l'indice %d et %d\n",first, last);
+            char *str = biginttosubstr(A, first, last);
+            printf("str = %s\n",str);
+
+            break;
+        default:
+            break;
+        }    
+    } 
+}
+
+void tests_2(){
+    unsigned int n;
+    printf("Testing Mersenne Function :\n\n");
+    printf("Veuillez entrez le nombre n :");
+    scanf("%u", &n);
+
+    int result = Mersenne(n);//ca prend plus de temps pour des n plus grand
+      
+    if (result) 
+        printf("(2^%u - 1) est un nombre premier de Mersenne.\n", n);
+    else
+        printf("(2^%u - 1) n'est pas un nombre premier de Mersenne.\n", n);
 }

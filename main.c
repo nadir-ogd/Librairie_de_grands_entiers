@@ -18,18 +18,9 @@
 #include "lib_big_int.h"
 
 int main(){
-      printf("- Tests unitaires des fonctions de la premiere partie -\n");
-      printf("- Tests unitaires des fonctions de la premiere partie -\n");
+      printf("<--------- Tests Fonctions Partie 1 --------->\n \n");
+      tests_1();
       
-      unsigned int n;
-      
-      printf("Veuillez entrez le nombre n : ");
-      scanf("%u", &n);
-
-      int result = Mersenne(n);
-      
-      if (result) 
-         printf("(2^%u - 1) est un nombre premier de Mersenne.\n", n);
-      else
-         printf("(2^%u - 1) n'est pas un nombre premier de Mersenne.\n", n);
+      printf("\n<--------- Tests Fonctions Partie 2 --------->\n \n");
+      tests_2(); 
     }
