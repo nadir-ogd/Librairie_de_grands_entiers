@@ -355,16 +355,22 @@ bigint *strtobigint(char *s){
         n->value[i] = 0;
     }
 
-    int ind = n->size-1;
-    
-    for (int i = 0; i < len; i += 9) {
-        unsigned int tmp = 0;
-        int cond_j = (ind == 0) ? len : 9 * (i + 1);
+    int ind = 0;
+    for (int i = len - 1; i >= 0; i -= 9) {
+        
+        unsigned int temp = 0;
+        if (ind == n->size-1){
+            for (int j = 0; j < i+1; j++)
+                temp = temp * 10 + (s[j] - '0'); 
+        }
+        else{
+            int cond_j = i - 9;
+            for (int j = cond_j + 1; j < cond_j + 10; j++)
+                temp = temp * 10 + (s[j] - '0');
+        }
 
-        for (int j = i; j < cond_j; j++)
-            tmp = tmp * 10 + (s[j] - '0');
-
-        n->value[ind--] = tmp;
+        n->value[ind] = temp;
+        ind++;
     }
 
     return n;
