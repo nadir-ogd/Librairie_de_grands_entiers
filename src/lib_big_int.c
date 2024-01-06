@@ -33,33 +33,39 @@ void freebigint(bigint *num) {
     num->size = 0;
 }
 
-// void initBigint(bigint *nb, const char *str) {
-//     int len = strlen(str);
+void initBigint(bigint *nb, const char *str) {
+    int len = strlen(str);
 
-//     nb->size = (len + 8) / 9;//+8 : car la plus petite valeur pour len est 1
-//     nb->value = (unsigned int *)malloc(nb->size * sizeof(unsigned int));
+    nb->size = (len + 8) / 9;//+8 : car la plus petite valeur pour len est 1
+    nb->value = (unsigned int *)malloc(nb->size * sizeof(unsigned int));
     
-//     if (nb->value == NULL) {
-//         fprintf(stderr, "Erreur d'allocation mémoire\n");
-//         exit(EXIT_FAILURE);
-//     }
+    if (nb->value == NULL) {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        exit(EXIT_FAILURE);
+    }
 
-//     for (int i = 0; i < nb->size; i++) {
-//         nb->value[i] = 0;
-//     }
+    for (int i = 0; i < nb->size; i++) {
+        nb->value[i] = 0;
+    }
 
-//     int ind = nb->size-1;
-    
-//     for (int i = 0; i < len; i += 9) {
-//         unsigned int temp = 0;
-//         int cond_j = (ind == 0) ? len : 9 * (i + 1);
+    int ind = 0;
+    for (int i = len - 1; i >= 0; i -= 9) {
+        
+        unsigned int temp = 0;
+        if (ind == nb->size-1){
+            for (int j = 0; j < i+1; j++)
+                temp = temp * 10 + (str[j] - '0'); 
+        }
+        else{
+            int cond_j = i - 9;
+            for (int j = cond_j + 1; j < cond_j + 10; j++)
+                temp = temp * 10 + (str[j] - '0');
+        }
 
-//         for (int j = i; j < cond_j; j++)
-//             temp = temp * 10 + (str[j] - '0');
-
-//         nb->value[ind--] = temp;
-//     }
-// }
+        nb->value[ind] = temp;
+        ind++;
+    }
+}
 
 
 int cmp(bigint a, bigint b){
@@ -222,93 +228,60 @@ bigint product(bigint a, bigint b) {
 }
 
 
-// void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo){
-//      if (cmp(a, b) == 0) {
-//         // a = b => (a/b = 1) et (a%b = 0)
-//         initBigint(quotient, "1");
-//         initBigint(modulo, "0");
-//     } else if (cmp(a, b) < 0) {
-//         // a < b => (a/b = 0) et (a%b = a)
-//         initBigint(quotient, "0");
-//         initBigint(modulo, biginttostr(a));
-//     } else{//a > b
-//         initBigint(quotient, "1");
-        
-//         initBigint(modulo, biginttostr(a));
-
-//         for(int i = 0; i < a.size; i++){
-//             modulo->value[i] = a.value[i];
-//         }
-
-//         for(int i = a.size-1; i >= 0; i--){
-//             while(cmp(*modulo, b) >= 0){
-//                 (*quotient).value[i]++;
-//                 *modulo = sub(*modulo, b);
-//             }
-//             if (i > 0) {
-//                 (*modulo).value[i - 1] += power(10, 9) * (*modulo).value[i];
-//                 (*modulo).value[i] = 0;
-//             }
-//         }
-
-//         // Supprimer les zéros non significatifs en tête du quotient
-//         while ((*quotient).size >= 2 && (*quotient).value[(*quotient).size - 1] == 0) {
-//             (*quotient).size--;
-//             (*quotient).value = (unsigned int *)realloc((*quotient).value, (*quotient).size * sizeof(unsigned int));
-           
-//             if ((*quotient).value == NULL) {
-//                 fprintf(stderr, "Erreur d'allocation mémoire\n");
-//                 exit(EXIT_FAILURE);
-//             }
-//         }
-//     }
-// }
-
 void intdiv(bigint a, bigint b, bigint *quotient, bigint *modulo) {
     if (cmp(a, b) == 0) {
         // a = b => (a/b = 1) et (a%b = 0)
-        quotient = strtobigint("1");
-        modulo = strtobigint("0");
+        initBigint(quotient, "1");
+        initBigint(modulo, "0");
     } else if (cmp(a, b) < 0) {
         // a < b => (a/b = 0) et (a%b = a)
-        quotient = strtobigint("0");
-        modulo = strtobigint(biginttostr(a));
-    } else { // a > b
-        quotient = strtobigint("0");
-        modulo = strtobigint(biginttostr(a));
+        initBigint(quotient, "0");
+        initBigint(modulo, biginttostr(a));
+    } else {
+        // a > b
+        initBigint(quotient, "0");
+        initBigint(modulo, biginttostr(a));
 
-        for (int i = 0; i < a.size; i++) {
-            modulo->value[i] = a.value[i];
-        }
+        bigint temp;
+        initBigint(&temp, "0");
 
         for (int i = a.size - 1; i >= 0; i--) {
-            while (cmp(*modulo, b) >= 0) {
-                (*quotient).value[i]++;
-                *modulo = sub(*modulo, b);
-            }
+            unsigned int currentDigit = a.value[i];
+            temp.size = 1;
+            temp.value[0] = currentDigit;
 
-            if (i > 0) {
+            while (cmp(temp, b) >= 0) {
+                // (*quotient) += power(10, 9 * i);
                 unsigned int carry = 0;
                 for (int j = 0; j <= i; j++) {
-                    unsigned long long temp = (unsigned long long)(*modulo).value[j] + (unsigned long long)1000000000 * carry;
-                    (*modulo).value[j] = (unsigned int)(temp % 1000000000);
-                    carry = (unsigned int)(temp / 1000000000);
+                    unsigned long long tempSum = (unsigned long long)(*quotient).value[j] +
+                                                  (unsigned long long)carry +
+                                                  (unsigned long long)power(10, 9 * i);
+                    (*quotient).value[j] = (unsigned int)(tempSum % power(10, 9));
+                    carry = (unsigned int)(tempSum / power(10, 9));
+                }
+
+                // temp = temp - b;
+                bigint tempB = b;
+                while (cmp(temp, tempB) >= 0) {
+                    tempB = add(tempB, b);
+                    temp = sub(temp, b);
                 }
             }
         }
 
+        for(int i = 0; i < temp.size; i++)
+            modulo->value[i] = temp.value[i];
+
         // Supprimer les zéros non significatifs en tête du quotient
         while ((*quotient).size >= 2 && (*quotient).value[(*quotient).size - 1] == 0) {
             (*quotient).size--;
-            (*quotient).value = (unsigned int *)realloc((*quotient).value, (*quotient).size * sizeof(unsigned int));
-
-            if ((*quotient).value == NULL) {
-                fprintf(stderr, "Erreur d'allocation mémoire\n");
-                exit(EXIT_FAILURE);
-            }
         }
+
+        freebigint(&temp);
     }
 }
+
 
 bigint pow2n(unsigned int n){
     bigint p;

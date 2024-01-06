@@ -13,7 +13,7 @@ unsigned int *value; /* valeur */
 } bigint;
 
 /* External funcitons */
-// void initBigint(bigint *nb, const char *str);
+void initBigint(bigint *nb, const char *str);
 unsigned int power(unsigned int base, unsigned int exponent);
 int countDigits(unsigned int x);
 void freebigint(bigint *num);
