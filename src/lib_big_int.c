@@ -614,7 +614,7 @@ void tests_1() {
 void tests_2(){
     unsigned int n;
     printf("Testing Mersenne Function :\n\n");
-    printf("Veuillez entrez le nombre n :");
+    printf("Veuillez entrez le nombre n : ");
     scanf("%u", &n);
 
     int result = Mersenne(n);//ca prend plus de temps pour des n plus grand
