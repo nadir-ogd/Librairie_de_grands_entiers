@@ -14,7 +14,7 @@ unsigned int size; /* taille */
 unsigned int *value; /* valeur */
 } bigint;
 
-/* External funcitons */
+/* External Functions */
 void initBigint(bigint *nb, const char *str);
 unsigned int power(unsigned int base, unsigned int exponent);
 int countDigits(unsigned int x);
@@ -36,5 +36,11 @@ char *biginttosubstr(bigint n, int first, int last);
 
 /* --- Part 2 Function --- */
 int Mersenne(unsigned int n); //Retourne 1 si 2^n - 1 est un nombre premier de Mersenne, 0 sinon
+
+
+/* Tests Functions */
+char* randomString();
+void tests_1();
+void tests_2();
 
 #endif

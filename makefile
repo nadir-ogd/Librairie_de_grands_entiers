@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g -Iinclude/
+CFLAGS = -Wall -std=c99 -g -Iinclude/
 OPT = -O3
 SRC = main.c $(wildcard src/*.c)
 

@@ -412,32 +412,19 @@ int Mersenne(unsigned int n) {
 
     // Calcul de M_n = 2^n - 1
     Mn = sub(pow2n(n), one);
-    printf("M_n (2^n - 1) = ");
-    printbigint(Mn);
 
     // Test de Lucas-Lehmer
     if (n > 2){
         for (unsigned int k = 2; k < n; k++) {
             bigint Sk = product(S, S);
             S = sub(Sk, two);
-            printf("Sk à l'itération %u = ",k);
-            printbigint(S);
-            printf("\n");
         }
-
-        printf("S(p-1) = ");
-        printbigint(S);
 
         // Vérification si le résultat final est nul
         bigint q,r;
         intdiv(S, Mn, &q, &r);
-        printf("\nQuotien : ");
-        printbigint(q);
-        printf("\nModulo : ");
-        printbigint(r);
 
         result = (r.size == 1 && r.value[0] == 0);
-        printf("result = %d\n",result);
         freebigint(&r);
         freebigint(&q);
     }
@@ -455,4 +442,30 @@ int Mersenne(unsigned int n) {
     freebigint(&one);
 
     return result;
+}
+
+char* randomString() {
+    int longueur = rand() % 50 + 1;
+    char* suite = (char*)malloc((longueur + 1) * sizeof(char));
+
+    if (suite == NULL) {
+        fprintf(stderr, "Erreur d'allocation de mémoire.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    srand((unsigned int)time(NULL));
+
+    for (int i = 0; i < longueur; ++i) {
+        suite[i] = '0' + rand() % 10;
+    }
+
+    suite[longueur] = '\0';
+
+    return suite;
+}
+
+void tests_1() {
+    int nbFunctions = 10;
+
+    for(int i = 0; i < ) 
 }
